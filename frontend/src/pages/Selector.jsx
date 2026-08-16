@@ -21,26 +21,13 @@ function weightLabel(weight) {
   return 'Neutral';
 }
 
-function ReliabilityDots({ score }) {
-  return (
-    <span style={{ letterSpacing: 2 }}>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <span key={n} style={{ color: n <= score ? 'var(--amber)' : 'var(--field-line)' }}>
-          ●
-        </span>
-      ))}
-    </span>
-  );
-}
-
 const selectStyle = {
-  background: 'var(--field-dark)',
-  border: '1px solid var(--field-line)',
-  color: 'var(--chalk)',
+  border: '1px solid var(--line)',
+  color: 'var(--ink)',
   borderRadius: 4,
   padding: '8px 10px',
-  fontFamily: 'var(--font-mono)',
-  fontSize: 12,
+  fontSize: 13,
+  fontFamily: 'inherit',
 };
 
 export default function Selector() {
@@ -127,11 +114,11 @@ export default function Selector() {
       {error && <div className="error-msg">{error}</div>}
 
       <div className="week-eyebrow">1. Choose a position</div>
-      <div className="pick-controls" style={{ marginBottom: 24 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
         {POSITIONS.map((pos) => (
           <button
             key={pos}
-            className={`team-btn ${position === pos ? 'selected' : ''}`}
+            className={`option-btn ${position === pos ? 'selected' : ''}`}
             onClick={() => handlePickPosition(pos)}
           >
             {pos}
@@ -143,154 +130,132 @@ export default function Selector() {
         <>
           <div className="week-eyebrow">2. What matters most for your {position}?</div>
           {categories.map((cat) => (
-            <div key={cat.key} className="game-card" style={{ padding: '12px 20px' }}>
-              <div className="matchup-row">
-                <div className="matchup-teams" style={{ fontSize: 15 }}>
-                  {cat.label}
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button
-                    className={`team-btn ${priorities[cat.key] === true ? 'selected' : ''}`}
+            <div key={cat.key} className="stat-row">
+              <span className="stat-row-label">{cat.label}</span>
+              <div className="radio-pair">
+                <label className="radio-option">
+                  Yes
+                  <span
+                    className={`radio-circle ${priorities[cat.key] === true ? 'checked' : ''}`}
                     onClick={() => togglePriority(cat.key, true)}
-                  >
-                    Prioritize: Yes
-                  </button>
-                  <button
-                    className={`team-btn ${priorities[cat.key] === false ? 'selected' : ''}`}
+                  />
+                </label>
+                <label className="radio-option">
+                  No
+                  <span
+                    className={`radio-circle ${priorities[cat.key] === false ? 'checked' : ''}`}
                     onClick={() => togglePriority(cat.key, false)}
-                  >
-                    Prioritize: No
-                  </button>
-                </div>
+                  />
+                </label>
               </div>
             </div>
           ))}
 
-          <button className="save-btn" onClick={handleRank} disabled={loading} style={{ marginTop: 8 }}>
-            {loading ? 'Ranking…' : 'Show my best options'}
+          <button className="primary-btn" onClick={handleRank} disabled={loading} style={{ marginTop: 8, marginBottom: 32 }}>
+            {loading ? 'Ranking…' : 'Show me my best options'}
           </button>
         </>
       )}
 
       {ranked && ranked.length === 0 && (
-        <div className="empty-state" style={{ marginTop: 32 }}>
-          No {position} players found in the pool yet.
-        </div>
+        <div className="empty-state">No {position} players found in the pool yet.</div>
       )}
 
       {current && (
-        <div style={{ marginTop: 32 }}>
+        <div>
           <div className="week-eyebrow">
             3. Your best {position} options — {carouselIndex + 1} of {ranked.length}
           </div>
 
-          <div className="game-card" style={{ padding: '24px' }}>
-            <div className="matchup-row">
-              <div>
-                <div className="matchup-teams" style={{ fontSize: 20 }}>
-                  <span style={{ color: 'var(--amber)', marginRight: 10 }}>#{carouselIndex + 1}</span>
-                  {current.name}
-                  <InjuryBadge status={current.injury_status} note={current.injury_note} />
-                </div>
-                <div className="kickoff">
-                  {current.position} · {current.nfl_team} · {current.final_score} weighted pts
-                </div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--chalk-dim)', marginBottom: 4 }}>
-                  RELIABILITY
-                </div>
-                <ReliabilityDots score={current.reliability} />
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--chalk-dim)', marginTop: 2 }}>
-                  {current.reliability}/5 · {current.reliability_label}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ marginTop: 20, borderTop: '1px dashed var(--field-line)', paddingTop: 16 }}>
-              <div className="week-eyebrow" style={{ marginBottom: 10 }}>
-                Score breakdown
-              </div>
-              {current.category_breakdown.map((row) => (
-                <div
-                  key={row.key}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '6px 0',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 12,
-                  }}
-                >
-                  <span style={{ color: 'var(--chalk-dim)' }}>{row.label}</span>
-                  <span style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                    <span>{row.statValue}</span>
-                    <span
-                      style={{
-                        color:
-                          row.weight === 1.5
-                            ? 'var(--amber)'
-                            : row.weight === 0.5
-                            ? 'var(--chalk-dim)'
-                            : 'var(--chalk)',
-                      }}
-                    >
-                      {weightLabel(row.weight)}
-                    </span>
-                    <span style={{ minWidth: 44, textAlign: 'right' }}>
-                      {row.pointsContribution > 0 ? '+' : ''}
-                      {row.pointsContribution}
-                    </span>
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ marginTop: 20, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-              {currentHasOpenSlot ? (
-                <>
-                  <select
-                    value={selectedSlot[current.id] || currentSlots[0].slot}
-                    onChange={(e) =>
-                      setSelectedSlot((prev) => ({ ...prev, [current.id]: e.target.value }))
-                    }
-                    style={selectStyle}
-                  >
-                    {currentSlots.map((s) => (
-                      <option key={s.slot} value={s.slot}>
-                        {s.slot}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    className="save-btn"
-                    onClick={() => handleAdd(current)}
-                    disabled={savingId === current.id}
-                  >
-                    {savingId === current.id ? 'Adding…' : 'Add to lineup'}
-                  </button>
-                </>
-              ) : (
-                <span className="status-pill">No open slot</span>
-              )}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
+          <div className="carousel-row" style={{ marginBottom: 16 }}>
             <button
-              className="team-btn"
+              className="carousel-arrow"
               onClick={() => setCarouselIndex((i) => Math.max(0, i - 1))}
               disabled={carouselIndex === 0}
+              aria-label="Previous player"
             >
-              ← Previous
+              ←
             </button>
+
+            <div className="carousel-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <div style={{ fontSize: 20, fontWeight: 700 }}>
+                    #{carouselIndex + 1} {current.name}
+                    <InjuryBadge status={current.injury_status} note={current.injury_note} />
+                  </div>
+                  <div style={{ color: 'var(--ink-dim)', fontSize: 14, marginTop: 4 }}>
+                    {current.position} · {current.nfl_team} · {current.final_score} weighted pts
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', fontSize: 13, color: 'var(--ink-dim)' }}>
+                  Reliability: {current.reliability}/5
+                  <br />
+                  {current.reliability_label}
+                </div>
+              </div>
+
+              <table className="data-table" style={{ marginTop: 20 }}>
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th>Projected</th>
+                    <th>Weighting</th>
+                    <th>Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {current.category_breakdown.map((row) => (
+                    <tr key={row.key}>
+                      <td style={{ color: 'var(--ink-dim)' }}>{row.label}</td>
+                      <td>{row.statValue}</td>
+                      <td>{weightLabel(row.weight)}</td>
+                      <td>
+                        {row.pointsContribution > 0 ? '+' : ''}
+                        {row.pointsContribution}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                {currentHasOpenSlot ? (
+                  <>
+                    <select
+                      value={selectedSlot[current.id] || currentSlots[0].slot}
+                      onChange={(e) =>
+                        setSelectedSlot((prev) => ({ ...prev, [current.id]: e.target.value }))
+                      }
+                      style={selectStyle}
+                    >
+                      {currentSlots.map((s) => (
+                        <option key={s.slot} value={s.slot}>
+                          {s.slot}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      className="primary-btn"
+                      onClick={() => handleAdd(current)}
+                      disabled={savingId === current.id}
+                    >
+                      {savingId === current.id ? 'Recruiting…' : 'Recruit'}
+                    </button>
+                  </>
+                ) : (
+                  <span className="status-pill">No open slot</span>
+                )}
+              </div>
+            </div>
+
             <button
-              className="team-btn"
+              className="carousel-arrow"
               onClick={() => setCarouselIndex((i) => Math.min(ranked.length - 1, i + 1))}
               disabled={carouselIndex === ranked.length - 1}
+              aria-label="Next player"
             >
-              Next →
+              →
             </button>
           </div>
         </div>

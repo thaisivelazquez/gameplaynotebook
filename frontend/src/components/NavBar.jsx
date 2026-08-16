@@ -14,7 +14,7 @@ export default function NavBar() {
   return (
     <div className="nav">
       <Link to="/" className="nav-brand">
-        Gridiron <span>Calls</span>
+        Playbook
       </Link>
       <div className="nav-links">
         {auth ? (
@@ -23,7 +23,7 @@ export default function NavBar() {
             <NavLink to="/lineup">Lineup</NavLink>
             <NavLink to="/selector">Selector</NavLink>
             <NavLink to="/rules">Rules</NavLink>
-            <button onClick={handleLogout}>Log out ({auth.user.username})</button>
+            <button onClick={handleLogout}>Log out</button>
           </>
         ) : (
           <>
