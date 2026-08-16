@@ -1,5 +1,6 @@
 const express = require('express');
 const pool = require('../db/pool');
+const { queryActivePlayers } = require('../db/activePlayers');
 const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
@@ -133,8 +134,7 @@ router.post('/recommend', requireAuth, async (req, res) => {
     const rules = await getOrCreateRules(req.user.id);
     const slotList = buildSlotList(rules);
 
-    const playersResult = await pool.query('SELECT * FROM players ORDER BY projected_points DESC');
-    const allPlayers = playersResult.rows;
+    const allPlayers = await queryActivePlayers();
     const used = new Set();
 
     function takeBest(positions) {

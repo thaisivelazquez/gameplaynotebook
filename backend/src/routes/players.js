@@ -1,27 +1,21 @@
-const express = require('express');
+﻿const express = require('express');
 const pool = require('../db/pool');
+const { queryActivePlayers } = require('../db/activePlayers');
 const { SCORING, POSITION_CATEGORIES } = require('../scoring');
 
 const router = express.Router();
 
-// GET /api/players?position=RB
 router.get('/', async (req, res) => {
   const { position } = req.query;
   try {
-    const result = position
-      ? await pool.query(
-          'SELECT * FROM players WHERE position = $1 ORDER BY projected_points DESC',
-          [position.toUpperCase()]
-        )
-      : await pool.query('SELECT * FROM players ORDER BY position, projected_points DESC');
-    res.json(result.rows);
+    const players = await queryActivePlayers({ position });
+    res.json(players);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to fetch players' });
   }
 });
 
-// GET /api/players/categories/:position - the scoring categories relevant to a position
 router.get('/categories/:position', (req, res) => {
   const position = req.params.position.toUpperCase();
   const keys = POSITION_CATEGORIES[position];
@@ -34,10 +28,6 @@ router.get('/categories/:position', (req, res) => {
   res.json({ position, categories });
 });
 
-// Reliability: how consistent a player's actual recent fantasy output has
-// been, week to week. Lower swing relative to their average = more
-// predictable = higher reliability. This is a read on real past
-// performance, not a confidence score from the model itself.
 function computeReliability(recentGames) {
   if (recentGames.length < 3) {
     return { score: 3, label: 'Limited data' };
@@ -59,17 +49,6 @@ function computeReliability(recentGames) {
   return { score: 1, label: 'Very volatile' };
 }
 
-// POST /api/players/rank
-// body: { position: 'RB', priorities: { rush_yards: true, receptions: false, ... } }
-//
-// Ranks every player at that position. Each category's contribution is the
-// player's projected stat in that category converted to league points, then
-// multiplied by a weight based on the user's priority: 1.5x if marked
-// "prioritize: yes", 0.5x if marked "no", 1x if left untouched. That
-// category-weighted score is blended with the neural network's baseline
-// projected_points (30%). Each player also gets a full category breakdown
-// and a 1-5 reliability score based on how consistent their recent real
-// output has been, for the profile carousel on the frontend.
 router.post('/rank', async (req, res) => {
   const { position, priorities = {} } = req.body;
   const pos = (position || '').toUpperCase();
@@ -80,11 +59,7 @@ router.post('/rank', async (req, res) => {
   }
 
   try {
-    const playersResult = await pool.query(
-      'SELECT * FROM players WHERE position = $1',
-      [pos]
-    );
-    const players = playersResult.rows;
+    const players = await queryActivePlayers({ position: pos });
 
     if (!players.length) {
       return res.json({ position: pos, ranked: [] });
@@ -102,7 +77,6 @@ router.post('/rank', async (req, res) => {
       statsByPlayer[row.player_id][row.stat_key] = Number(row.stat_value);
     }
 
-    // Recent real fantasy_points history, used only to gauge consistency (reliability).
     const historyResult = await pool.query(
       `SELECT player_id, fantasy_points FROM player_stats_history
        WHERE player_id = ANY($1::int[])

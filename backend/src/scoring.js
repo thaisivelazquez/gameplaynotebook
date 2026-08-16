@@ -33,4 +33,10 @@ const POSITION_CATEGORIES = {
   DEF: ['sacks', 'def_int', 'fumble_rec', 'def_td', 'pts_allowed_score'],
 };
 
-module.exports = { SCORING, POSITION_CATEGORIES };
+// Positions with real historical stats tracked (see ml/fetch_real_data.py).
+// K and DEF don't have a real data source wired up yet, so they're never
+// filtered by "did this player play recently" — there's nothing to check
+// them against. Once a real K/DEF data source exists, add them here.
+const REAL_DATA_POSITIONS = ['QB', 'RB', 'WR', 'TE'];
+
+module.exports = { SCORING, POSITION_CATEGORIES, REAL_DATA_POSITIONS };
