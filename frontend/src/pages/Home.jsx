@@ -21,9 +21,8 @@ export default function Home() {
         <div className="box hub">
           <div className="week-eyebrow">Build your Lineup</div>
           <p style={{ color: 'var(--ink-dim)', fontSize: 14, margin: 0 }}>
-            New here? Head to Lineup and hit <strong>Get recommended lineup</strong> — it auto-fills
-            every slot with the highest-projected player available, so you're never starting from a
-            blank roster. Rules and Selector both feed into what shows up here.
+            Head to Lineup and hit <strong>Get recommended lineup</strong> — it auto-fills
+            every slot with the highest-projected player available. Can adjust Rules and Selector.
           </p>
         </div>
 
