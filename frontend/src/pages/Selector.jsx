@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { api } from '../api/client.js';
 import { useAuth } from '../api/AuthContext.jsx';
 import InjuryBadge from '../components/InjuryBadge.jsx';
@@ -43,7 +43,7 @@ export default function Selector() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  async function handlePickPosition(pos) {
+async function handlePickPosition(pos) {
     setPosition(pos);
     setRanked(null);
     setPriorities({});
@@ -56,6 +56,7 @@ export default function Selector() {
       ]);
       setCategories(catData.categories);
       setRoster(rosterData);
+      setPriorities(Object.fromEntries(catData.categories.map((cat) => [cat.key, true])));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -108,7 +109,7 @@ export default function Selector() {
       <h1 className="page-title">Player Selector</h1>
       <p className="page-sub">
         Pick a position, tell us what stats matter most to you, then flip through your best
-        options — top pick first.
+        options â€” top pick first.
       </p>
 
       {error && <div className="error-msg">{error}</div>}
@@ -152,7 +153,7 @@ export default function Selector() {
           ))}
 
           <button className="primary-btn" onClick={handleRank} disabled={loading} style={{ marginTop: 8, marginBottom: 32 }}>
-            {loading ? 'Ranking…' : 'Show me my best options'}
+            {loading ? 'Rankingâ€¦' : 'Show me my best options'}
           </button>
         </>
       )}
@@ -164,7 +165,7 @@ export default function Selector() {
       {current && (
         <div>
           <div className="week-eyebrow">
-            3. Your best {position} options — {carouselIndex + 1} of {ranked.length}
+            3. Your best {position} options â€” {carouselIndex + 1} of {ranked.length}
           </div>
 
           <div className="carousel-row" style={{ marginBottom: 16 }}>
@@ -174,7 +175,7 @@ export default function Selector() {
               disabled={carouselIndex === 0}
               aria-label="Previous player"
             >
-              ←
+              â†
             </button>
 
             <div className="carousel-card">
@@ -185,7 +186,7 @@ export default function Selector() {
                     <InjuryBadge status={current.injury_status} note={current.injury_note} />
                   </div>
                   <div style={{ color: 'var(--ink-dim)', fontSize: 14, marginTop: 4 }}>
-                    {current.position} · {current.nfl_team} · {current.final_score} weighted pts
+                    {current.position} Â· {current.nfl_team} Â· {current.final_score} weighted pts
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', fontSize: 13, color: 'var(--ink-dim)' }}>
@@ -240,7 +241,7 @@ export default function Selector() {
                       onClick={() => handleAdd(current)}
                       disabled={savingId === current.id}
                     >
-                      {savingId === current.id ? 'Recruiting…' : 'Recruit'}
+                      {savingId === current.id ? 'Recruitingâ€¦' : 'Recruit'}
                     </button>
                   </>
                 ) : (
@@ -255,7 +256,7 @@ export default function Selector() {
               disabled={carouselIndex === ranked.length - 1}
               aria-label="Next player"
             >
-              →
+              â†’
             </button>
           </div>
         </div>
