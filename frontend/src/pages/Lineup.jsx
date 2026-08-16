@@ -9,6 +9,7 @@ export default function Lineup() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recommending, setRecommending] = useState(false);
+  const [clearingAll, setClearingAll] = useState(false);
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
@@ -47,6 +48,19 @@ export default function Lineup() {
       await load();
     } catch (err) {
       setError(err.message);
+    }
+  }
+
+  async function handleClearAll() {
+    setClearingAll(true);
+    setError('');
+    try {
+      await api.clearRoster(auth.token);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setClearingAll(false);
     }
   }
 
@@ -125,9 +139,14 @@ export default function Lineup() {
       )}
 
       {!loading && !isEmpty && (
-        <button className="option-btn" onClick={handleRecommend} disabled={recommending}>
-          {recommending ? 'Rebuilding...' : 'Re-run recommended lineup'}
-        </button>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button className="option-btn" onClick={handleRecommend} disabled={recommending}>
+            {recommending ? 'Rebuilding...' : 'Re-run recommended lineup'}
+          </button>
+          <button className="option-btn" onClick={handleClearAll} disabled={clearingAll}>
+            {clearingAll ? 'Clearing...' : 'Clear all lineup'}
+          </button>
+        </div>
       )}
     </div>
   );

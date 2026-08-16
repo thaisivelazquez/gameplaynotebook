@@ -126,6 +126,17 @@ router.delete('/:slot', requireAuth, async (req, res) => {
   }
 });
 
+// DELETE /api/roster - clear every slot in the user's lineup, so they can start over
+router.delete('/', requireAuth, async (req, res) => {
+  try {
+    await pool.query('DELETE FROM roster WHERE user_id = $1', [req.user.id]);
+    res.status(204).send();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to clear lineup' });
+  }
+});
+
 // POST /api/roster/recommend - auto-fill the lineup with the best available
 // projected players for each slot, respecting the user's current rules.
 // This powers the "new user" suggested-lineup flow.

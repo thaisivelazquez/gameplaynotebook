@@ -37,5 +37,6 @@ export const api = {
   getRoster: (token) => request('/roster/me', { token }),
   setRosterSlot: (payload, token) => request('/roster', { method: 'POST', body: payload, token }),
   clearRosterSlot: (slot, token) => request(`/roster/${slot}`, { method: 'DELETE', token }),
+  clearRoster: (token) => request('/roster', { method: 'DELETE', token }),
   recommendRoster: (token) => request('/roster/recommend', { method: 'POST', token }),
 };
