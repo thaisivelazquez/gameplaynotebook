@@ -11,7 +11,7 @@ export default function InjuryBadge({ status, note }) {
   return (
     <span className={`injury-badge ${status}`} title={note || undefined}>
       {INJURY_LABELS[status]}
-      {note ? ` · ${note}` : ''}
+      {note ? ` | ${note}` : ''}
     </span>
   );
 }

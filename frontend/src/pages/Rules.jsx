@@ -58,7 +58,7 @@ export default function Rules() {
       </p>
 
       {error && <div className="error-msg">{error}</div>}
-      {loading && <div className="loading-state">Loading…</div>}
+      {loading && <div className="loading-state">Loading...</div>}
 
       {form && (
         <form onSubmit={handleSave}>
@@ -88,11 +88,11 @@ export default function Rules() {
           </table>
 
           <button className="primary-btn" type="submit" disabled={saving}>
-            {saving ? 'Saving…' : 'Save rules'}
+            {saving ? 'Saving...' : 'Save rules'}
           </button>
           {saved && (
             <p style={{ color: 'var(--accent)', fontSize: 13, marginTop: 10 }}>
-              Saved — check your Lineup to see the updated slots.
+              Saved - check your Lineup to see the updated slots.
             </p>
           )}
         </form>

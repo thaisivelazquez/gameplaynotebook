@@ -227,12 +227,8 @@ h1.page-title {
 }
 
 .radio-circle.checked::after {
-  content: '✓';
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 700;
+  content: '\2713';
 }
-
 /* ---------- Player carousel (Selector results) ---------- */
 .carousel-row {
   display: flex;

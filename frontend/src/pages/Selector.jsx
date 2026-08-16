@@ -43,7 +43,7 @@ export default function Selector() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-async function handlePickPosition(pos) {
+  async function handlePickPosition(pos) {
     setPosition(pos);
     setRanked(null);
     setPriorities({});
@@ -56,6 +56,8 @@ async function handlePickPosition(pos) {
       ]);
       setCategories(catData.categories);
       setRoster(rosterData);
+      // Default every stat to "prioritize: yes" so results appear immediately
+      // without requiring the user to click through each row first.
       setPriorities(Object.fromEntries(catData.categories.map((cat) => [cat.key, true])));
     } catch (err) {
       setError(err.message);
@@ -109,7 +111,7 @@ async function handlePickPosition(pos) {
       <h1 className="page-title">Player Selector</h1>
       <p className="page-sub">
         Pick a position, tell us what stats matter most to you, then flip through your best
-        options â€” top pick first.
+        options - top pick first.
       </p>
 
       {error && <div className="error-msg">{error}</div>}
@@ -153,7 +155,7 @@ async function handlePickPosition(pos) {
           ))}
 
           <button className="primary-btn" onClick={handleRank} disabled={loading} style={{ marginTop: 8, marginBottom: 32 }}>
-            {loading ? 'Rankingâ€¦' : 'Show me my best options'}
+            {loading ? 'Ranking...' : 'Show me my best options'}
           </button>
         </>
       )}
@@ -165,7 +167,7 @@ async function handlePickPosition(pos) {
       {current && (
         <div>
           <div className="week-eyebrow">
-            3. Your best {position} options â€” {carouselIndex + 1} of {ranked.length}
+            3. Your best {position} options - {carouselIndex + 1} of {ranked.length}
           </div>
 
           <div className="carousel-row" style={{ marginBottom: 16 }}>
@@ -175,7 +177,7 @@ async function handlePickPosition(pos) {
               disabled={carouselIndex === 0}
               aria-label="Previous player"
             >
-              â†
+              {'<'}
             </button>
 
             <div className="carousel-card">
@@ -186,7 +188,7 @@ async function handlePickPosition(pos) {
                     <InjuryBadge status={current.injury_status} note={current.injury_note} />
                   </div>
                   <div style={{ color: 'var(--ink-dim)', fontSize: 14, marginTop: 4 }}>
-                    {current.position} Â· {current.nfl_team} Â· {current.final_score} weighted pts
+                    {current.position} | {current.nfl_team} | {current.final_score} weighted pts
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', fontSize: 13, color: 'var(--ink-dim)' }}>
@@ -241,7 +243,7 @@ async function handlePickPosition(pos) {
                       onClick={() => handleAdd(current)}
                       disabled={savingId === current.id}
                     >
-                      {savingId === current.id ? 'Recruitingâ€¦' : 'Recruit'}
+                      {savingId === current.id ? 'Recruiting...' : 'Recruit'}
                     </button>
                   </>
                 ) : (
@@ -256,7 +258,7 @@ async function handlePickPosition(pos) {
               disabled={carouselIndex === ranked.length - 1}
               aria-label="Next player"
             >
-              â†’
+              {'>'}
             </button>
           </div>
         </div>

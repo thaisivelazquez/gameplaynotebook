@@ -28,7 +28,7 @@ export default function Register() {
   }
 
   return (
-    <div className="auth-card">
+    <div className="auth-box">
       <h1 className="page-title">Sign up</h1>
       <p className="page-sub">Create an account to start predicting.</p>
       {error && <div className="error-msg">{error}</div>}
@@ -59,7 +59,7 @@ export default function Register() {
           />
         </div>
         <button className="primary-btn" type="submit" disabled={loading}>
-          {loading ? 'Creating account…' : 'Create account'}
+          {loading ? 'Creating account...' : 'Create account'}
         </button>
       </form>
       <div className="auth-switch">

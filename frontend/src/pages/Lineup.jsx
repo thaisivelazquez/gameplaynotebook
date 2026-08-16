@@ -59,8 +59,8 @@ export default function Lineup() {
       <h1 className="page-title">My Current Lineup</h1>
       <p className="page-sub">
         {loading
-          ? 'Loading…'
-          : `${filledCount} of ${totalSlots} slots filled · edit your format on the Rules tab`}
+          ? 'Loading...'
+          : `${filledCount} of ${totalSlots} slots filled | edit your format on the Rules tab`}
       </p>
 
       {error && <div className="error-msg">{error}</div>}
@@ -73,7 +73,7 @@ export default function Lineup() {
             Selector.
           </p>
           <button className="primary-btn" onClick={handleRecommend} disabled={recommending}>
-            {recommending ? 'Building your lineup…' : 'Get recommended lineup'}
+            {recommending ? 'Building your lineup...' : 'Get recommended lineup'}
           </button>
         </div>
       )}
@@ -95,19 +95,19 @@ export default function Lineup() {
             {data.lineup.map(({ slot, player }) => (
               <tr key={slot}>
                 <td style={{ color: 'var(--ink-dim)' }}>{slot}</td>
-                <td>{player ? player.name : '—'}</td>
-                <td>{player ? player.nfl_team : '—'}</td>
-                <td>{player ? player.position : '—'}</td>
+                <td>{player ? player.name : ' - '}</td>
+                <td>{player ? player.nfl_team : ' - '}</td>
+                <td>{player ? player.position : ' - '}</td>
                 <td>
                   {player && player.injury_status ? (
                     <InjuryBadge status={player.injury_status} note={player.injury_note} />
                   ) : player ? (
                     'Healthy'
                   ) : (
-                    '—'
+                    ' - '
                   )}
                 </td>
-                <td>{player ? `${player.projected_points} pts` : '—'}</td>
+                <td>{player ? `${player.projected_points} pts` : ' - '}</td>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   <Link to="/selector" className="text-btn" style={{ marginRight: 12 }}>
                     {player ? 'Swap' : 'Fill'}
@@ -126,7 +126,7 @@ export default function Lineup() {
 
       {!loading && !isEmpty && (
         <button className="option-btn" onClick={handleRecommend} disabled={recommending}>
-          {recommending ? 'Rebuilding…' : 'Re-run recommended lineup'}
+          {recommending ? 'Rebuilding...' : 'Re-run recommended lineup'}
         </button>
       )}
     </div>

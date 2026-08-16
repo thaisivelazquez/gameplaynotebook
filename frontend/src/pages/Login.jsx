@@ -27,7 +27,7 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-card">
+    <div className="auth-box">
       <h1 className="page-title">Log in</h1>
       <p className="page-sub">Get back to making your calls.</p>
       {error && <div className="error-msg">{error}</div>}
@@ -47,7 +47,7 @@ export default function Login() {
           />
         </div>
         <button className="primary-btn" type="submit" disabled={loading}>
-          {loading ? 'Logging in…' : 'Log in'}
+          {loading ? 'Logging in...' : 'Log in'}
         </button>
       </form>
       <div className="auth-switch">
