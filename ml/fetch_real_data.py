@@ -1,25 +1,35 @@
 """
-Pull real weekly offensive stats (QB/RB/WR/TE) from nfl_data_py and write them
-out in the "long format" import_category_stats.py expects:
+Pull real weekly offensive stats (QB/RB/WR/TE) straight from nflverse's
+GitHub release and write them out in the "long format"
+import_category_stats.py expects:
     player_name, position, nfl_team, season, week, stat_key, stat_value
 
 Usage:
     python fetch_real_data.py 2023 2024 2025
     (pass one or more season years; each season is a full year of weekly data)
 
-Requires: pip install nfl_data_py
+NOTE: this reads the parquet files directly rather than going through
+nfl_data_py's import_weekly_data(), because nflverse renamed their release
+from "player_stats" to "stats_player" in Jan 2026 and nfl_data_py (as of
+0.3.3) hasn't been updated to match yet. If nfl_data_py releases a fix later,
+you can switch back to `nfl.import_weekly_data(seasons)` — the column names
+below would need to move back to the old names too (see comments).
 """
 import sys
 import pandas as pd
-import nfl_data_py as nfl
 
 from scoring_config import REAL_DATA_POSITIONS
 
-# Maps nfl_data_py's column names -> our stat_key names.
+URL_TEMPLATE = "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_{0}.parquet"
+
+# Current (2026+) column names -> our stat_key names.
+# If nfl_data_py fixes their URL and you switch to import_weekly_data(), the
+# source column for interceptions goes back to 'interceptions' (not
+# 'passing_interceptions'), and 'team' goes back to 'recent_team'.
 STAT_COLUMN_MAP = {
     "passing_yards": "pass_yards",
     "passing_tds": "pass_td",
-    "interceptions": "interceptions",
+    "passing_interceptions": "interceptions",
     "rushing_yards": "rush_yards",
     "rushing_tds": "rush_td",
     "receptions": "receptions",
@@ -27,13 +37,16 @@ STAT_COLUMN_MAP = {
     "receiving_tds": "rec_td",
 }
 
-# These three get summed into a single 'fumbles_lost' stat_key.
 FUMBLE_COLUMNS = ["sack_fumbles_lost", "rushing_fumbles_lost", "receiving_fumbles_lost"]
 
 
 def main(seasons):
-    print(f"Downloading weekly data for seasons: {seasons} (this can take a minute)...")
-    df = nfl.import_weekly_data(seasons)
+    frames = []
+    for year in seasons:
+        url = URL_TEMPLATE.format(year)
+        print(f"Downloading {url} ...")
+        frames.append(pd.read_parquet(url))
+    df = pd.concat(frames, ignore_index=True)
 
     df = df[df["position"].isin(REAL_DATA_POSITIONS)].copy()
     df["fumbles_lost"] = df[[c for c in FUMBLE_COLUMNS if c in df.columns]].sum(axis=1)
@@ -45,7 +58,7 @@ def main(seasons):
         base = {
             "player_name": row.get("player_display_name") or row.get("player_name"),
             "position": row["position"],
-            "nfl_team": row.get("recent_team") or row.get("team"),
+            "nfl_team": row.get("team") or row.get("recent_team"),
             "season": int(row["season"]),
             "week": int(row["week"]),
         }
